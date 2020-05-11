@@ -1,30 +1,47 @@
 #pragma once
 
-#include "Lexer.h"
-
-#include <iostream>
 #include <exception>
+
+#include "Cobra.h"
+
+#include "Token.h"
+#include "Expr.h"
 
 class Parser {
 public:
     Parser(const std::vector<Token>& tokens)
-     : tokens(tokens) {
-         parse();
-     }
+     : tokens(tokens) {}
+    
+    std::string stringify(const std::unique_ptr<Expr>& e){
+        std::string text = "";
+        if(e->operands.size() > 0) text += "(";
+        text += e->root.text;
+        for(const auto& operand : e->operands){
+            text += " " + stringify(operand);
+        }
+        if(e->operands.size() > 0) text += ")";
+        return text;
+    }
 
-    void parse(){
+    const std::unique_ptr<Expr>& parse(){
         try {
-            consume(LEFT_PAREN, "Expected Paren");
+            expr = expression();
+            std::cout << stringify(expr) << std::endl;
         } catch(ParseError& e){
             std::cout << e.getStr() << std::endl;
+            
+            expr = std::unique_ptr<Expr>(new Expr(Token(0, END)));
         }
+        return expr;
     }
 private:
-
+    
     class ParseError : public std::exception {
     public:
         ParseError(Token t, std::string message){
-            str = "Parse Error on line " + std::to_string(t.line) + " at token '" + t.to_string() + "': " + message;
+            str = 
+                "Parse Error on line " + std::to_string(t.line)
+                + " at lexeme '" + t.text + "': " + message;
         }
 
         const std::string& getStr(){ return str; }
@@ -32,10 +49,10 @@ private:
         std::string str;
     };
 
-    Token previous(){
+    const Token& previous(){
         return tokens[current - 1];
     }
-    Token peek(){
+    const Token& peek(){
         return tokens[current];
     }
     bool atEnd(){
@@ -45,7 +62,7 @@ private:
         if(atEnd()) return false;
         return (peek().type == type);
     }
-    Token advance(){
+    const Token& advance(){
         if(!atEnd()) current++;
         return previous();
     }
@@ -60,19 +77,26 @@ private:
     bool match(First first, Args... rest){
         if(!match(first)){
             return match(rest...);
-        }
-        else return true;
+        } else return true;
     }
-    Token consume(TokenType type, std::string message){
+    const Token& consume(TokenType type, std::string message){
         if(check(type)) return advance();
-        
         throw ParseError(peek(), message);
     }
 
     //functions for consuming grammar
-    void expression();
+    std::unique_ptr<Expr> expression();
+    std::unique_ptr<Expr> equality();
+    std::unique_ptr<Expr> comparison();
+    std::unique_ptr<Expr> addition();
+    std::unique_ptr<Expr> multiplication();
+    std::unique_ptr<Expr> unary();
+    std::unique_ptr<Expr> primary();
+    
+    //used in panic error mode    
+    void synchronize();
 
     int current = 0;
-
     const std::vector<Token>& tokens;
+    std::unique_ptr<Expr> expr;
 };

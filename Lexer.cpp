@@ -2,40 +2,21 @@
 
 #include <iostream>
 
-std::string type_to_string(TokenType t){
-    switch(t){    
-        case(LEFT_PAREN): { return std::string("LEFT_PAREN"); } break;
-        case(RIGHT_PAREN): { return std::string("RIGHT_PAREN"); } break;
-        case(COMMA): { return std::string("COMMA"); } break;
-        case(SEMICOLON): { return std::string("SEMICOLON"); } break;
+bool Lexer::first = true;
+std::map<std::string, TokenType> Lexer::keywords;
 
-        case(ASSIGN): { return std::string("ASSIGN"); } break;
+void Lexer::initLex(){
+    keywords["true"] = TRUE;
+    keywords["false"] = FALSE;
         
-        case(EQUAL): { return std::string("EQUAL"); } break;
-        case(NOT_EQUAL): { return std::string("NOT_EQUAL"); } break;
-        case(GREATER_THAN): { return std::string("GREATER_THAN"); } break;
-        case(LESS_THAN): { return std::string("LESS_THAN"); } break;
-        case(GREATER_THAN_EQUAL): { return std::string("GREATER_THAN_EQUAL"); } break;
-        case(LESS_THAN_EQUAL): { return std::string("LESS_THAN_EQUAL"); } break;
-
-        case(NOT): { return std::string("NOT"); } break;
-        case(AND): { return std::string("AND"); } break;
-        case(OR): { return std::string("OR"); } break;
-
-        case(ADD): { return std::string("ADD"); } break;
-        case(SUBTRACT): { return std::string("SUBTRACT"); } break;
-        case(MULTIPLY): { return std::string("MULTIPLY"); } break;
-        case(DIVIDE): { return std::string("DIVIDE"); } break;
-
-        case(IDENTIFIER): { return std::string("IDENTIFIER"); } break;
-        case(FLOAT): { return std::string("FLOAT"); } break;
-        
-        case(END): { return std::string("END"); } break;
-     }
 }
 
 Lexer::Lexer(const std::string& text)
  : text(text) {
+    if(first){
+        first = false;
+        initLex();
+    }
     lex(); 
 }
 
@@ -58,18 +39,18 @@ void Lexer::getToken(){
         case(','): addToken(COMMA); break;
         case(';'): addToken(SEMICOLON); break;
         
-        case('+'): addToken(ADD); break;
-        case('-'): addToken(SUBTRACT); break;
-        case('*'): addToken(MULTIPLY); break;
-        case('/'): match('/') ? getLineComment() : addToken(DIVIDE); break;
+        case('+'): addToken(PLUS); break;
+        case('-'): addToken(MINUS); break;
+        case('*'): addToken(STAR); break;
+        case('/'): match('/') ? getLineComment() : addToken(SLASH); break;
         
         case('='): match('>') ? addToken(ASSIGN) : addToken(EQUAL); break;
         
         case('!'): match('=') ? addToken(NOT_EQUAL) : addToken(NOT); break;
         case('>'): match('=') 
-                   ? addToken(GREATER_THAN_EQUAL) : addToken(GREATER_THAN); break;
+                   ? addToken(GREATER_EQUAL) : addToken(GREATER); break;
         case('<'): match('=') 
-                   ? addToken(LESS_THAN_EQUAL) : addToken(LESS_THAN); break;
+                   ? addToken(LESS_EQUAL) : addToken(LESS); break;
     
         case('&'): addToken(AND); break;
         case('|'): addToken(OR); break;
@@ -103,18 +84,22 @@ void Lexer::getLineComment(){
     line++;
 }
 
-//TODO: add a hash map for keywords
 void Lexer::getIdentifier(){
     while(isAlphaNumeric(peek())) advance();
-
-    std::string id = text.substr(start, current-start);
-    addToken(IDENTIFIER, id);
+    
+    std::string str = text.substr(start, current-start);
+    TokenType nameType;
+    try {
+        nameType = keywords.at(str);
+    } catch(std::out_of_range& e) {
+        nameType = IDENTIFIER;
+    }
+    
+    addToken(nameType);
 }
 
 //TODO: add floating point support
 void Lexer::getFloat(){
     while(isDigit(peek())) advance();
-
-    std::string num = text.substr(start, current-start);
-    addToken(FLOAT, std::stof(num));
+    addToken(NUMBER);
 }

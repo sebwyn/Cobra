@@ -1,70 +1,7 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <memory>
-
-#include <iostream>
-
-enum TokenType {
-    LEFT_PAREN,
-    RIGHT_PAREN,
-    COMMA,
-    SEMICOLON,
-
-    ASSIGN,
-    
-    EQUAL,
-    NOT_EQUAL,
-    GREATER_THAN,
-    LESS_THAN,
-    GREATER_THAN_EQUAL,
-    LESS_THAN_EQUAL,
-
-    NOT,
-    AND,
-    OR,
-
-    ADD,
-    SUBTRACT,
-    MULTIPLY,
-    DIVIDE,
-
-    IDENTIFIER,
-    FLOAT,
-
-    END
-};
-
-std::string type_to_string(TokenType t);
-
-struct Token {
-    
-    template<typename T>
-    Token(int line, TokenType type, T _value)
-     : line(line), type(type) {
-        value = std::static_pointer_cast<void>(std::make_shared<T>(_value));
-    }
-
-    std::string to_string(){
-        std::string stringValue = " ";
-        switch(type){
-            case(IDENTIFIER):
-                stringValue += *(std::static_pointer_cast<std::string>(value));
-                break;
-            case(FLOAT):
-                stringValue += std::to_string(*(std::static_pointer_cast<float>(value)));
-                break;
-            default:
-                break;
-        }
-        return type_to_string(type) + stringValue;
-    }
-
-    int line;
-    TokenType type;
-    std::shared_ptr<void> value;
-};
+#include "Cobra.h"
+#include "Token.h"
 
 class Lexer {
 public:
@@ -74,6 +11,12 @@ public:
 
     std::vector<Token>& getTokens(){ return tokens; }
 private:
+    
+    static void initLex();
+
+    static bool first;
+    static std::map<std::string, TokenType> keywords;
+    
 
     bool atEnd(){
         if(current > text.length()) return true;
@@ -100,14 +43,10 @@ private:
     }
     
     void addToken(TokenType type){
-        tokens.push_back(Token(line, type, 0));
+        std::string lexemeText = text.substr(start, current-start); 
+	    tokens.push_back(Token(line, type, lexemeText));
     }
     
-    template<typename T>
-    void addToken(TokenType type, T value){
-        tokens.push_back(Token(line, type, value)); 
-    }
-
     void emitError(const std::string& message);
     
     void getToken();

@@ -1,7 +1,9 @@
+#include "Cobra.h"
+
 #include "Lexer.h"
 #include "Parser.h"
+#include "Interpreter.h"
 
-#include <iostream>
 #include <fstream>
 
 int main(int argc, char** argv){
@@ -15,14 +17,18 @@ int main(int argc, char** argv){
             }
             myfile.close();
         }
-        else std::cout << "Unable to open file"; 
+        else std::cout << "Unable to open file" << std::endl; 
         
+	    std::cout << "Tokens: " << std::endl;
         Lexer lexer(text);
         for(Token token : lexer.getTokens()){
-            std::cout << token.to_string() << std::endl;
+            std::cout << type_to_string(token.type) << " " << token.text << std::endl;
         }
-
-        Parser parser(lexer.getTokens());
+	    std::cout << "Abstract Syntax Tree: " << std::endl;
+	    Parser parser(lexer.getTokens());
+	
+	    Interpreter interpreter;
+	    std::cout << interpreter.interpret(parser.parse()) << std::endl;
     }
     return 0;
 }
