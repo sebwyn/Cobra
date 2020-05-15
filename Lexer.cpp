@@ -9,6 +9,7 @@ void Lexer::initLex(){
     keywords["true"] = TRUE;
     keywords["false"] = FALSE;
     keywords["print"] = PRINT;        
+    keywords["while"] = WHILE;
 }
 
 Lexer::Lexer(const std::string& text)
@@ -36,7 +37,9 @@ void Lexer::getToken(){
     switch(c){
         case('('): addToken(LEFT_PAREN); break;
         case(')'): addToken(RIGHT_PAREN); break;
-        case(','): addToken(COMMA); break;
+        case('{'): addToken(LEFT_BRACE); break;
+        case('}'): addToken(RIGHT_BRACE); break;
+	    case(','): addToken(COMMA); break;
         case(';'): addToken(SEMICOLON); break;
         
         case('+'): addToken(PLUS); break;
@@ -44,7 +47,7 @@ void Lexer::getToken(){
         case('*'): addToken(STAR); break;
         case('/'): match('/') ? getLineComment() : addToken(SLASH); break;
         
-	case(':'): 
+	    case(':'): 
 		if(match('=')) addToken(ASSIGN); 
 		else emitError("Unexpected symbol '"+std::string(1, c) +"'"); 
 		break;

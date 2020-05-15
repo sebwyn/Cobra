@@ -7,6 +7,8 @@
 enum TokenType {
     LEFT_PAREN,
     RIGHT_PAREN,
+    LEFT_BRACE,
+    RIGHT_BRACE,
     COMMA,
     SEMICOLON,
 
@@ -37,7 +39,8 @@ enum TokenType {
     TRUE,
     FALSE,
     PRINT,
-
+    WHILE,    
+	
     //purely grammatical types (not from lexer)
     GROUPING
 };

@@ -28,6 +28,18 @@ public:
     virtual void visitPrintStmt(Stmt::PrintStmt* stmt) override {
         std::cout << eval(stmt->e).string() << std::endl; 
     }
+
+    virtual void visitWhileStmt(Stmt::WhileStmt* stmt) override {
+        while(true){
+            bool b;
+            Object cond = eval(stmt->cond);
+            if(!cond.get(b))
+                throw RuntimeException(stmt->cond->root,
+                    "Expected BOOL expression");
+            if(!b) return;
+            interpret(stmt->body);
+        }
+    }
     
     //the parser ensures that the left hand side token is an identifier
     virtual Object visitAssignment(Expr::Assignment* assignment) override {

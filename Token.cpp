@@ -4,6 +4,8 @@ std::string type_to_string(TokenType t){
     switch(t){    
         case(LEFT_PAREN): { return std::string("LEFT_PAREN"); } break;
         case(RIGHT_PAREN): { return std::string("RIGHT_PAREN"); } break;
+	    case(LEFT_BRACE): { return "LEFT_BRACE"; } break;
+        case(RIGHT_BRACE): { return "RIGHT_BRACE"; } break;
         case(COMMA): { return std::string("COMMA"); } break;
         case(SEMICOLON): { return std::string("SEMICOLON"); } break;
 
@@ -33,6 +35,7 @@ std::string type_to_string(TokenType t){
         case(TRUE): { return std::string("TRUE"); } break;
         case(FALSE): { return std::string("FALSE"); } break;
         case(PRINT): { return std::string("PRINT"); } break;     
+	    case(WHILE): { return std::string("WHILE"); } break;
 	}
 }
 

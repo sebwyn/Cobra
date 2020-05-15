@@ -9,6 +9,7 @@ private:
         enum Type {
             FLOAT,
             BOOL,
+            FUNCTION,
             NIL
         };
 
@@ -34,7 +35,7 @@ private:
         virtual Internal::Type getType() override { return type; }
         virtual std::string getTypeString() override { return type_string; }
        	
-	virtual std::string string() override { return getTypeString(); }
+	    virtual std::string string() override { return getTypeString(); }
  
         static Type type;
         static std::string type_string;

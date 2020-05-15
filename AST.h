@@ -97,12 +97,14 @@ class Stmt {
 public:
     class ExprStmt;
     class PrintStmt;    
-
+    class WhileStmt;    
+	
     class Visitor {
     public:
         virtual void visitExprStmt(ExprStmt* stmt){}
         virtual void visitPrintStmt(PrintStmt* stmt){}    
-	};
+	    virtual void visitWhileStmt(WhileStmt* stmt){}
+    };
     
     virtual ~Stmt() {}
 
@@ -140,5 +142,25 @@ public:
 
     virtual void accept(Visitor* visitor) override {
         visitor->visitPrintStmt(this);
+    }
+};
+
+class Stmt::WhileStmt : public Stmt {
+public: 
+    WhileStmt(Expr* cond, std::vector<Stmt*> _body)
+    : cond(cond), body(_body) {}
+     
+    Expr* cond;
+    std::vector<Stmt*> body;
+
+    virtual ~WhileStmt() override {
+        delete cond;
+        for(auto stmt : body){
+            delete stmt;
+        }
+    }
+
+    virtual void accept(Visitor* visitor) override {
+        visitor->visitWhileStmt(this);
     }
 };

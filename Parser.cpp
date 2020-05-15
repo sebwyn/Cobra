@@ -8,6 +8,18 @@ Stmt* Parser::statement(){
         Expr* e = expression();
         consume(SEMICOLON, "Expected ;");
         return new Stmt::PrintStmt(e);
+    } else if(match(WHILE)){
+        Expr* condition = expression();
+        std::vector<Stmt*> body;         
+
+        consume(LEFT_BRACE, "Expected '{'");
+        while(!match(RIGHT_BRACE)){
+            if(atEnd())
+                throw ParseError(previous(), "Expected '}'");
+            body.push_back(statement()); 
+        }
+
+        return new Stmt::WhileStmt(condition, body);
     }
     //dont have any other statements right now 
     Expr* e = expression();
