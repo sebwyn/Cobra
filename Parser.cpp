@@ -25,7 +25,9 @@ Expr* Parser::assignment(){
     if(match(ASSIGN)){
         Token operation = previous();
         auto right = assignment();
-        return new Expr::Assignment(operation, e->root, right); 
+        if(e->root.type != IDENTIFIER)
+            throw ParseError(right->root, "Expected identifier");    
+	    return new Expr::Assignment(operation, e->root, right); 
     }
     return e;
 }

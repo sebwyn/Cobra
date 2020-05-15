@@ -8,6 +8,8 @@
 class Interpreter : public Expr::Visitor, public Stmt::Visitor {
 private:
     class RuntimeException;
+
+    std::map<std::string, Object> environment;
 public:
     void interpret(const std::vector<Stmt*>& statements){
 	for(auto stmt : statements){
@@ -25,6 +27,15 @@ public:
     
     virtual void visitPrintStmt(Stmt::PrintStmt* stmt) override {
         std::cout << eval(stmt->e).string() << std::endl; 
+    }
+    
+    //the parser ensures that the left hand side token is an identifier
+    virtual Object visitAssignment(Expr::Assignment* assignment) override {
+        Object right = eval(assignment->right);
+        
+        environment[assignment->left.text] = right; 
+        
+        return right;
     }
 
     virtual Object visitBinary(Expr::Binary* binary) override {
@@ -151,7 +162,20 @@ public:
     }
 
     virtual Object visitPrimary(Expr::Primary* primary) override {
-        return primary->root.value;
+        switch(primary->root.type){
+            case TRUE:
+            case FALSE:
+            case NUMBER:
+                return primary->root.value;
+            case IDENTIFIER:
+                try {
+                    return environment.at(primary->root.text); 
+                } catch(std::out_of_range& e) {
+                    throw RuntimeException(primary->root, "Undefined symbol");
+                }
+            default:
+                return Object();
+        }
     }
 private:
 

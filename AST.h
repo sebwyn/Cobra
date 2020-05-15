@@ -114,7 +114,7 @@ public:
 class Stmt::ExprStmt : public Stmt {
 public:
     ExprStmt(Expr* e) 
-    : e(e) {}
+    : e(e) {} 
 
     Expr* e;
     

@@ -32,6 +32,8 @@ int main(int argc, char** argv){
 	    Interpreter interpreter;
 	    std::cout << interpreter.interpret(parser.parse()) << std::endl;
     }*/
+
+    Interpreter interpreter;
     while(true){
         std::string input;
     
@@ -47,7 +49,6 @@ int main(int argc, char** argv){
         //std::cout << "Abstract Syntax Tree: " << std::endl;
         Parser parser(lexer.getTokens());
 
-        Interpreter interpreter;
 	interpreter.interpret(parser.parse());
         //std::cout << interpreter.interpret(parser.parse()) << std::endl;
     }
