@@ -8,7 +8,7 @@ std::map<std::string, TokenType> Lexer::keywords;
 void Lexer::initLex(){
     keywords["true"] = TRUE;
     keywords["false"] = FALSE;
-        
+    keywords["print"] = PRINT;        
 }
 
 Lexer::Lexer(const std::string& text)
@@ -44,7 +44,11 @@ void Lexer::getToken(){
         case('*'): addToken(STAR); break;
         case('/'): match('/') ? getLineComment() : addToken(SLASH); break;
         
-        case('='): match('>') ? addToken(ASSIGN) : addToken(EQUAL); break;
+	case(':'): 
+		if(match('=')) addToken(ASSIGN); 
+		else emitError("Unexpected symbol '"+std::string(1, c) +"'"); 
+		break;
+        case('='): addToken(EQUAL); break;
         
         case('!'): match('=') ? addToken(NOT_EQUAL) : addToken(NOT); break;
         case('>'): match('=') 

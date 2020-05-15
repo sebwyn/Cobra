@@ -32,13 +32,14 @@ enum TokenType {
     NUMBER,
 
     END,
-
+    
+    //keywords
     TRUE,
     FALSE,
+    PRINT,
 
     //purely grammatical types (not from lexer)
-    GROUPING,
-    NEGATE
+    GROUPING
 };
 
 std::string type_to_string(TokenType t);
@@ -53,13 +54,13 @@ struct Token {
         //floats and identifier tokens need to store their values
         switch(type){
             case(NUMBER):
-                value = std::make_shared<FloatObject>(std::stof(text));
+                value = Object(std::stof(text));
                 break;
             case(TRUE):
-                value = std::make_shared<BoolObject>(true);
+                value = Object(true);
                 break;
             case(FALSE):
-                value = std::make_shared<BoolObject>(false);
+                value = Object(false);
             default:
                 break;
         } 
@@ -70,6 +71,6 @@ struct Token {
     std::string text;
     
     //some tokens can be mapped directly into objects in our language
-    std::shared_ptr<Object> value;
+    Object value;
 };
 

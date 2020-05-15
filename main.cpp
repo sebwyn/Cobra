@@ -7,6 +7,8 @@
 #include <fstream>
 
 int main(int argc, char** argv){
+    
+    /*
     if(argc > 1){
         std::string line, text;
         std::ifstream myfile (argv[1]);
@@ -29,6 +31,25 @@ int main(int argc, char** argv){
 	
 	    Interpreter interpreter;
 	    std::cout << interpreter.interpret(parser.parse()) << std::endl;
+    }*/
+    while(true){
+        std::string input;
+    
+        std::cout << "cobra>";
+        getline(std::cin, input);
+
+        Lexer lexer(input);
+        //std::cout << "Tokens: " << std::endl;
+        /*for(Token token : lexer.getTokens()){
+            std::cout << type_to_string(token.type) 
+                      << " " << token.text << std::endl;
+        }*/
+        //std::cout << "Abstract Syntax Tree: " << std::endl;
+        Parser parser(lexer.getTokens());
+
+        Interpreter interpreter;
+	interpreter.interpret(parser.parse());
+        //std::cout << interpreter.interpret(parser.parse()) << std::endl;
     }
     return 0;
 }

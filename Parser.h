@@ -5,37 +5,10 @@
 #include "Cobra.h"
 
 #include "Token.h"
-#include "Expr.h"
+#include "AST.h"
 
 class Parser {
 public:
-    Parser(const std::vector<Token>& tokens)
-     : tokens(tokens) {}
-    
-    std::string stringify(const std::unique_ptr<Expr>& e){
-        std::string text = "";
-        if(e->operands.size() > 0) text += "(";
-        text += e->root.text;
-        for(const auto& operand : e->operands){
-            text += " " + stringify(operand);
-        }
-        if(e->operands.size() > 0) text += ")";
-        return text;
-    }
-
-    const std::unique_ptr<Expr>& parse(){
-        try {
-            expr = expression();
-            std::cout << stringify(expr) << std::endl;
-        } catch(ParseError& e){
-            std::cout << e.getStr() << std::endl;
-            
-            expr = std::unique_ptr<Expr>(new Expr(Token(0, END)));
-        }
-        return expr;
-    }
-private:
-    
     class ParseError : public std::exception {
     public:
         ParseError(Token t, std::string message){
@@ -48,6 +21,27 @@ private:
     private:
         std::string str;
     };
+
+    Parser(const std::vector<Token>& tokens)
+     : tokens(tokens) {}
+
+    const std::vector<Stmt*>& parse(){
+        try {
+            while(!atEnd())    
+        	    statements.push_back(statement());
+        } catch(ParseError& e){
+            std::cout << e.getStr() << std::endl;
+        }
+        return statements;
+    }
+
+    ~Parser(){
+        for(auto stmt : statements){
+            delete stmt;
+        }
+    }  
+    
+private:
 
     const Token& previous(){
         return tokens[current - 1];
@@ -81,22 +75,30 @@ private:
     }
     const Token& consume(TokenType type, std::string message){
         if(check(type)) return advance();
+        std::cout << "Throwing Parse Error" << std::endl;	
         throw ParseError(peek(), message);
     }
 
     //functions for consuming grammar
-    std::unique_ptr<Expr> expression();
-    std::unique_ptr<Expr> equality();
-    std::unique_ptr<Expr> comparison();
-    std::unique_ptr<Expr> addition();
-    std::unique_ptr<Expr> multiplication();
-    std::unique_ptr<Expr> unary();
-    std::unique_ptr<Expr> primary();
+    // parsing statements
+    Stmt* statement();
+    
+    //parsing expressions
+    Expr* expression();
+    Expr* assignment();
+    Expr* logicalAnd();
+    Expr* logicalOr();
+    Expr* equality();
+    Expr* comparison();
+    Expr* addition();
+    Expr* multiplication();
+    Expr* unary();
+    Expr* primary();
     
     //used in panic error mode    
     void synchronize();
 
     int current = 0;
     const std::vector<Token>& tokens;
-    std::unique_ptr<Expr> expr;
+    std::vector<Stmt*> statements;
 };
