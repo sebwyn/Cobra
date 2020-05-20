@@ -5,16 +5,22 @@
 #include "Object.h"
 #include "AST.h"
 
+#include "Function.h"
+
 class Interpreter : public Expr::Visitor, public Stmt::Visitor {
 private:
     class RuntimeException;
 
-    std::map<std::string, Object> environment;
+    std::vector<std::map<std::string, Object>*> environments;
 public:
-    void interpret(const std::vector<Stmt*>& statements){
+    void interpret(const std::vector<Stmt*>& statements, std::map<std::string, Object>* environ){
 	for(auto stmt : statements){
             try {
+                environments.push_back(environ);
+                std::cout << "Begun executing" << std::endl;
                 execute(stmt);
+	            std::cout << "Done executing" << std::endl;	
+                environments.pop_back();
             } catch(RuntimeException& e){
                 std::cout << e.message << std::endl;
             }
@@ -22,11 +28,18 @@ public:
     }
 
     virtual void visitExprStmt(Stmt::ExprStmt* stmt) override {
-        eval(stmt->e);    
+        std::cout << "Visiting ExprStmt" << std::endl;
+        Object o;
+	    o = eval(stmt->e);
+        std::cout << "Done evaling ExprStmt" << std::endl;  
 	}
     
     virtual void visitPrintStmt(Stmt::PrintStmt* stmt) override {
         std::cout << eval(stmt->e).string() << std::endl; 
+    }
+
+    virtual void visitFuncStmt(Stmt::FuncStmt* stmt) override {
+        (*(environments.back()))[stmt->name.text] = stmt->func;
     }
 
     virtual void visitWhileStmt(Stmt::WhileStmt* stmt) override {
@@ -37,7 +50,7 @@ public:
                 throw RuntimeException(stmt->cond->root,
                     "Expected BOOL expression");
             if(!b) return;
-            interpret(stmt->body);
+            interpret(stmt->body, environments.back());
         }
     }
     
@@ -45,7 +58,7 @@ public:
     virtual Object visitAssignment(Expr::Assignment* assignment) override {
         Object right = eval(assignment->right);
         
-        environment[assignment->left.text] = right; 
+        (*(environments.back()))[assignment->left.text] = right; 
         
         return right;
     }
@@ -172,21 +185,38 @@ public:
             }
         }
     }
+    
+    virtual Object visitFunction(Expr::Function* function) override {
+        Function f;
+        Object func = eval(function->e);
+        if(!func.get(f))
+            throw RuntimeException(function->e->root,"Expected function Expr"); 
+        //bind args to param names
+        int argNum = 0;
+        for(auto arg : function->args){
+            if(argNum >= f.params->size())
+                throw RuntimeException(function->root, "Too many args given to function");
+            f.environ[(*f.params)[argNum].text] = eval(arg);
+            argNum++;
+        }
+        if(argNum < f.params->size())
+            throw RuntimeException(function->root, "Too few args passed to function");
+        std::cout << "Interpreting with environment " << &f.environ<<std::endl;
+        std::cout << "Interpreting body " << f.body<<std::endl;
+        interpret(f.body->body, &(f.environ));
+        std::cout << "Done interpreting function call" << std::endl; 
+   	}
 
     virtual Object visitPrimary(Expr::Primary* primary) override {
         switch(primary->root.type){
-            case TRUE:
-            case FALSE:
-            case NUMBER:
-                return primary->root.value;
             case IDENTIFIER:
                 try {
-                    return environment.at(primary->root.text); 
+                    return environments.back()->at(primary->root.text); 
                 } catch(std::out_of_range& e) {
                     throw RuntimeException(primary->root, "Undefined symbol");
                 }
             default:
-                return Object();
+                return primary->root.value;
         }
     }
 private:
@@ -208,7 +238,10 @@ private:
     
     //evaluate expressions
     Object eval(Expr* e){
-	//std::cout << "evaling " << e->root.text << std::endl;
-	return e->accept(this);
+        //std::cout << "evaling " << e->root.text << std::endl;
+        Object o = e->accept(this);
+        std::cout << "Done evaling" << std::endl;
+	    //std::cout << "Done evaling with " << o.string() << std::endl; 
+        return o;
     }
 };

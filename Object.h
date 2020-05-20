@@ -48,13 +48,13 @@ public:
     
     Object(){
         value = new Internal();
-        //std::cout << "Constructing empty object at " << value << std::endl; 
+        std::cout << "Constructing empty object at " << value << std::endl; 
     }
  
     template<typename T>
     Object(T _value){
         value = new InternalType<T>(_value);
-        //std::cout << "Constructing object of type " << value->getTypeString() <<                     " at address " << value << std::endl;
+        std::cout << "Constructing object of type " << value->getTypeString() <<                     " at address " << value << std::endl;
     }
 
     ~Object(){
@@ -97,31 +97,11 @@ public:
 
 private:
     void delValue(){
-        //std::cout << "Attempting to delete " << value << std::endl;
+        std::cout << "Attempting to delete " << value << std::endl;
         //std::cout << "Deleting object of type " << value->getTypeString() <<
         //             " at address " << value << std::endl;
         delete value;
     }
 
-    void copyValue(const Object& other){
-        switch(other.value->getType()){
-            case Internal::BOOL: {
-                bool v;
-                other.get(v);
-                value = new InternalType<bool>(v);
-                break;
-            }
-            case Internal::FLOAT: {
-                float v;
-                other.get(v);
-                value = new InternalType<float>(v);
-                break; 
-            }
-            case Internal::NIL: {
-                value = new Internal();
-            }	
-        }
-        //std::cout << "Copying object at " << other.value << " with type: " << 
-        //         other.value->getTypeString() << " into " << value << std::endl;
-    }	
+    void copyValue(const Object& other);
 };

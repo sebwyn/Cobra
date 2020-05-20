@@ -10,6 +10,7 @@ void Lexer::initLex(){
     keywords["false"] = FALSE;
     keywords["print"] = PRINT;        
     keywords["while"] = WHILE;
+    keywords["func"] = FUNC;	
 }
 
 Lexer::Lexer(const std::string& text)

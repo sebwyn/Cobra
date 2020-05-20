@@ -93,6 +93,7 @@ private:
     Expr* addition();
     Expr* multiplication();
     Expr* unary();
+    Expr* function(); 
     Expr* primary();
     
     //used in panic error mode    

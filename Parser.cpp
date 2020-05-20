@@ -20,6 +20,29 @@ Stmt* Parser::statement(){
         }
 
         return new Stmt::WhileStmt(condition, body);
+    } else if(match(FUNC)){
+        consume(IDENTIFIER, "Expected name");
+        Token name = previous();
+        
+        //parse out the params
+        std::vector<Token> params;
+        consume(LEFT_PAREN, "Expected '('");
+        while(!match(RIGHT_PAREN)){
+            if(atEnd())
+                throw ParseError(previous(), "Expected ')'");
+            consume(IDENTIFIER, "Expected name");
+            params.push_back(previous());
+            if(check(RIGHT_PAREN)) consume(COMMA, "Expected ','"); 
+        }
+        //parse out the body
+        std::vector<Stmt*> body;
+        consume(LEFT_BRACE, "Expected '{'");
+        while(!match(RIGHT_BRACE)){
+            if(atEnd())
+                throw ParseError(previous (), "Expected '}'");
+            body.push_back(statement()); 
+        }
+        return new Stmt::FuncStmt(name, params, body);
     }
     //dont have any other statements right now 
     Expr* e = expression();
@@ -105,7 +128,23 @@ Expr* Parser::unary(){
         Token operation = previous();
         return new Expr::Unary(operation, unary());
     }
-    return primary();
+    return function();
+}
+Expr* Parser::function(){
+    auto expr = primary();
+    while(match(LEFT_PAREN)){
+	auto operation = previous();
+        //parse out params/args
+        std::vector<Expr*> params;
+        while(!match(RIGHT_PAREN)){
+	        if(atEnd())
+                throw ParseError(previous(), "Expected ')'");
+            params.push_back(expression());
+            if(!check(RIGHT_PAREN)) consume(COMMA, "Expected ','"); 
+        }
+        expr = new Expr::Function(operation, expr, params);
+    }
+    return expr;
 }
 Expr* Parser::primary(){
 

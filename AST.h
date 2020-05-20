@@ -10,6 +10,7 @@ public:
     class Assignment;
     class Binary;
     class Unary;
+    class Function;
     class Primary;
 
     class Visitor {
@@ -17,6 +18,7 @@ public:
         virtual Object visitAssignment(Assignment* assignment){}
         virtual Object visitBinary(Binary* binary){}
         virtual Object visitUnary(Unary* unary){}
+        virtual Object visitFunction(Function* function){}
         virtual Object visitPrimary(Primary* primary){}
     };
     
@@ -81,6 +83,26 @@ public:
     }
 };
 
+class Expr::Function : public Expr {
+public:
+    Expr* e;
+    std::vector<Expr*> args;
+    
+    Function(Token t, Expr* e, std::vector<Expr*> args)
+    : Expr(Token(t.line, CALL)), e(e), args(args) {}
+
+    virtual Object accept(Visitor* visitor) override {
+        return visitor->visitFunction(this);
+    }
+
+    virtual ~Function(){
+        delete e;
+        for(auto arg : args){
+            delete arg;
+        }
+    }
+};
+
 class Expr::Primary : public Expr {
 public:
     Primary(Token root)
@@ -98,12 +120,14 @@ public:
     class ExprStmt;
     class PrintStmt;    
     class WhileStmt;    
+    class FuncStmt;
 	
     class Visitor {
     public:
         virtual void visitExprStmt(ExprStmt* stmt){}
         virtual void visitPrintStmt(PrintStmt* stmt){}    
 	    virtual void visitWhileStmt(WhileStmt* stmt){}
+        virtual void visitFuncStmt(FuncStmt* stmt){}
     };
     
     virtual ~Stmt() {}
@@ -162,5 +186,19 @@ public:
 
     virtual void accept(Visitor* visitor) override {
         visitor->visitWhileStmt(this);
+    }
+};
+
+class Stmt::FuncStmt : public Stmt {
+public:
+    Token name;
+    Object func;    
+
+    FuncStmt(Token name, std::vector<Token> params, std::vector<Stmt*> body);
+    
+    virtual ~FuncStmt() override {}
+
+    virtual void accept(Visitor* visitor) override {
+        visitor->visitFuncStmt(this);
     }
 };

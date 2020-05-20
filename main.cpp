@@ -3,6 +3,7 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "Interpreter.h"
+#include "Object.h"
 
 #include <fstream>
 
@@ -32,7 +33,7 @@ int main(int argc, char** argv){
 	    Interpreter interpreter;
 	    std::cout << interpreter.interpret(parser.parse()) << std::endl;
     }*/
-
+    std::map<std::string, Object> base;
     Interpreter interpreter;
     while(true){
         std::string input;
@@ -49,7 +50,7 @@ int main(int argc, char** argv){
         //std::cout << "Abstract Syntax Tree: " << std::endl;
         Parser parser(lexer.getTokens());
 
-	interpreter.interpret(parser.parse());
+	    interpreter.interpret(parser.parse(), &base);
         //std::cout << interpreter.interpret(parser.parse()) << std::endl;
     }
     return 0;

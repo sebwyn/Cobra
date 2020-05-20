@@ -39,10 +39,12 @@ enum TokenType {
     TRUE,
     FALSE,
     PRINT,
-    WHILE,    
+    WHILE,
+    FUNC, 
 	
     //purely grammatical types (not from lexer)
-    GROUPING
+    GROUPING,
+    CALL
 };
 
 std::string type_to_string(TokenType t);

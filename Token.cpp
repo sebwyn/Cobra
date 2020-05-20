@@ -36,6 +36,7 @@ std::string type_to_string(TokenType t){
         case(FALSE): { return std::string("FALSE"); } break;
         case(PRINT): { return std::string("PRINT"); } break;     
 	    case(WHILE): { return std::string("WHILE"); } break;
-	}
+	    case(FUNC): { return "FUNC"; } break;
+    }
 }
 
