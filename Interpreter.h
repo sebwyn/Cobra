@@ -28,6 +28,7 @@ public:
     }
 
     virtual void visitExprStmt(Stmt::ExprStmt* stmt) override {
+        
         std::cout << "Visiting ExprStmt" << std::endl;
         Object o;
 	    o = eval(stmt->e);
@@ -185,7 +186,7 @@ public:
             }
         }
     }
-    
+ 
     virtual Object visitFunction(Expr::Function* function) override {
         Function f;
         Object func = eval(function->e);
