@@ -28,11 +28,11 @@ public:
     Function(const std::vector<Token>& _params,const std::vector<Stmt*>& _body){
 	    params = std::make_shared<std::vector<Token>>(_params);
         body = std::make_shared<Code>(_body); 
-        std::cout << "Making new function: params = " << params << " body = " << body << std::endl;
+        //std::cout << "Making new function: params = " << params << " body = " << body << std::endl;
     }
 
     ~Function(){
-        std::cout << this << ": deleting params " << params << " " << params.use_count() << " body " << body << " " << body.use_count() << std::endl;
+        //std::cout << this << ": deleting params " << params << " " << params.use_count() << " body " << body << " " << body.use_count() << std::endl;
     }    
 
     //shared amongst all functions with the same declaration

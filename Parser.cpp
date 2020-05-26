@@ -32,11 +32,11 @@ Stmt* Parser::statement(){
                 throw ParseError(previous(), "Expected ')'");
             consume(IDENTIFIER, "Expected name");
             params.push_back(previous());
-            if(check(RIGHT_PAREN)) consume(COMMA, "Expected ','"); 
+            if(!check(RIGHT_PAREN)) consume(COMMA, "Expected ','"); 
         }
         //parse out the body
         std::vector<Stmt*> body;
-        consume(LEFT_BRACE, "Expected '{'");
+        consume(LEFT_BRACE, "Expected '{'"); 
         while(!match(RIGHT_BRACE)){
             if(atEnd())
                 throw ParseError(previous (), "Expected '}'");

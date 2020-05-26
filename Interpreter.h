@@ -17,9 +17,9 @@ public:
 	for(auto stmt : statements){
             try {
                 environments.push_back(environ);
-                std::cout << "Begun executing" << std::endl;
+                //std::cout << "Begun executing" << std::endl;
                 execute(stmt);
-	            std::cout << "Done executing" << std::endl;	
+	            //std::cout << "Done executing" << std::endl;	
                 environments.pop_back();
             } catch(RuntimeException& e){
                 std::cout << e.message << std::endl;
@@ -28,11 +28,7 @@ public:
     }
 
     virtual void visitExprStmt(Stmt::ExprStmt* stmt) override {
-        
-        std::cout << "Visiting ExprStmt" << std::endl;
-        Object o;
-	    o = eval(stmt->e);
-        std::cout << "Done evaling ExprStmt" << std::endl;  
+	    eval(stmt->e);
 	}
     
     virtual void visitPrintStmt(Stmt::PrintStmt* stmt) override {
@@ -202,11 +198,12 @@ public:
         }
         if(argNum < f.params->size())
             throw RuntimeException(function->root, "Too few args passed to function");
-        std::cout << "Interpreting with environment " << &f.environ<<std::endl;
-        std::cout << "Interpreting body " << f.body<<std::endl;
-        interpret(f.body->body, &(f.environ));
-        std::cout << "Done interpreting function call" << std::endl; 
-   	}
+        //TODO: catch return values
+        //try {
+            interpret(f.body->body, &(f.environ));
+        //} catch(ReturnValue& ret){} 
+   	    return Object();
+    }
 
     virtual Object visitPrimary(Expr::Primary* primary) override {
         switch(primary->root.type){
@@ -239,10 +236,7 @@ private:
     
     //evaluate expressions
     Object eval(Expr* e){
-        //std::cout << "evaling " << e->root.text << std::endl;
         Object o = e->accept(this);
-        std::cout << "Done evaling" << std::endl;
-	    //std::cout << "Done evaling with " << o.string() << std::endl; 
         return o;
     }
 };

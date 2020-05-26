@@ -55,6 +55,6 @@ void Object::copyValue(const Object& other){
             break;
         }	
     }
-    std::cout << "Copying object at " << other.value << " with type: " << 
-            other.value->getTypeString() << " into " << value << std::endl;
+    //std::cout << "Copying object at " << other.value << " with type: " << 
+    //        other.value->getTypeString() << " into " << value << std::endl;
 }	

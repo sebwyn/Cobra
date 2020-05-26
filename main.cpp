@@ -38,7 +38,7 @@ int main(int argc, char** argv){
     while(true){
         std::string input;
     
-        std::cout << "cobra>";
+        std::cout << "Cobra#";
         getline(std::cin, input);
 
         Lexer lexer(input);

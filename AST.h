@@ -15,11 +15,11 @@ public:
 
     class Visitor {
     public:
-        virtual Object visitAssignment(Assignment* assignment){}
-        virtual Object visitBinary(Binary* binary){}
-        virtual Object visitUnary(Unary* unary){}
-        virtual Object visitFunction(Function* function){}
-        virtual Object visitPrimary(Primary* primary){}
+        virtual Object visitAssignment(Assignment* assignment) = 0;
+        virtual Object visitBinary(Binary* binary) = 0;
+        virtual Object visitUnary(Unary* unary) = 0;
+        virtual Object visitFunction(Function* function) = 0;
+        virtual Object visitPrimary(Primary* primary) = 0;
     };
     
     Token root;
@@ -29,7 +29,7 @@ public:
     
     virtual ~Expr(){}
 	
-    virtual Object accept(Visitor* visitor){} 
+    virtual Object accept(Visitor* visitor) = 0; 
     
 };
 

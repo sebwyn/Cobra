@@ -48,13 +48,13 @@ public:
     
     Object(){
         value = new Internal();
-        std::cout << "Constructing empty object at " << value << std::endl; 
+        //std::cout << "Constructing empty object at " << value << std::endl; 
     }
  
     template<typename T>
     Object(T _value){
         value = new InternalType<T>(_value);
-        std::cout << "Constructing object of type " << value->getTypeString() <<                     " at address " << value << std::endl;
+        //std::cout << "Constructing object of type " << value->getTypeString() <<                     " at address " << value << std::endl;
     }
 
     ~Object(){
@@ -65,9 +65,10 @@ public:
         copyValue(other);
     }
 
-    Object& operator=(const Object& other){
+    const Object& operator=(const Object& other){
         delValue();
 	    copyValue(other);
+        return other;
     }
     
     template<typename T>
@@ -97,7 +98,7 @@ public:
 
 private:
     void delValue(){
-        std::cout << "Attempting to delete " << value << std::endl;
+        //std::cout << "Attempting to delete " << value << std::endl;
         //std::cout << "Deleting object of type " << value->getTypeString() <<
         //             " at address " << value << std::endl;
         delete value;
